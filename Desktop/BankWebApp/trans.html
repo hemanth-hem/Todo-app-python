@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link href = 'style.css' rel = 'stylesheet' />
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+    <title>Bank App</title>
+</head>
+<body>
+    <div>
+        <input type= "text" id = "amount">
+        <p id = 'balance'></p>
+        <button id = 'deposit'>Deposit</button>
+        <button id = 'withdraw'>Withdraw</button>
+    </div>
+
+    <!-- <script src = "https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"> </script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7/web3.min.js" integrity="sha512-yAmmVkOXqtDZRaueLdmLwMB67JtaRtjFzQGiAiJKvLiFlDvq4Tzm5R6uLcOMyvPRQlXpYHdYxc5IbiCwuquhUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src = "https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+
+    <script type = 'module'>
+        var contract;
+        $(document).ready(function(){
+            web3 = new Web3(web3.currentProvider);
+            console.log(web3);
+            
+            var address = "0x488678C9E260812eA0b8a01d82f496a9B1e6607c"
+            
+            var abi = [
+	{
+        "constant" : false,
+		"inputs": [
+			{
+				"internalType": "address payable",
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "message",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "keyword",
+				"type": "string"
+			}
+		],
+		"name": "addToBlockchain",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "message",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "keyword",
+				"type": "string"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "getAllTransactions",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "receiver",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "message",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "keyword",
+						"type": "string"
+					}
+				],
+				"internalType": "struct Transactions.TransferStruct[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getTransactionCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+            
+            
+            contract = new web3.eth.Contract(abi,address);
+            contract.methods.getBalance().call().then(function(bal)
+            {
+                $('#balance').html(bal);
+            })
+
+            $('#deposit').click(function(){
+                var amt = 0;
+                amt = parseInt($('#amount').val());
+                console.log(amt);
+
+                web3.eth.requestAccounts().then(function(accounts)
+                {
+                    var acc = accounts[0];
+                    console.log(acc);
+                    return contract.methods.deposit(amt).send({from: acc});
+                }).then(function(tx)
+                {
+                    console.log(tx);
+                    contract.methods.getBalance().call().then(function(bal)
+            {
+                $('#balance').html(bal);
+            })
+            $('#amount').val() = ''
+                }).catch(function(tx)
+                {
+                    console.log(tx);
+                })
+            })
+            $('#withdraw').click(function(){
+                var amt = 0;
+                amt = parseInt($('#amount').val());
+                console.log(amt);
+
+                web3.eth.requestAccounts().then(function(accounts)
+                {
+                    var acc = accounts[0];
+                    console.log(acc);
+                    return contract.methods.withdraw(amt).send({from: acc});
+                }).then(function(tx)
+                {
+                    console.log(tx);
+                    contract.methods.getBalance().call().then(function(bal)
+            {
+                $('#balance').html(bal);
+            })
+            $('#amount').val() = '';
+                }).catch(function(tx)
+                {
+                    console.log(tx);
+                })
+            })
+
+        })
+    </script>
+
+</body>
+</html>
